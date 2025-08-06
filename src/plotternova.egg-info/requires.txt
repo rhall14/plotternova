@@ -1,0 +1,5 @@
+numpy>=2.2.0
+matplotlib>=3.9.0
+
+[testing]
+scipy>=1.14.0

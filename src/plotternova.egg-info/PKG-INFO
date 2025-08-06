@@ -1,0 +1,18 @@
+Metadata-Version: 2.4
+Name: plotternova
+Version: 0.0.1
+Summary: Collection of useful classes for swiftly designing nice plots, built on matplotlib
+Author-email: Randon Hall <randonph02@gmail.com>
+License-Expression: MIT
+Keywords: plot,bacon,sausage,tomatoes,Lobster Thermidor
+Classifier: Development Status :: 3 - Alpha
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+Requires-Dist: numpy>=2.2.0
+Requires-Dist: matplotlib>=3.9.0
+Provides-Extra: testing
+Requires-Dist: scipy>=1.14.0; extra == "testing"

@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools >= 61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "plotternova"
+description = "Collection of useful classes for swiftly designing nice plots, built on matplotlib"
+version = "0.0.1"
+authors = [
+  {name = "Randon Hall", email = "randonph02@gmail.com"},
+]
+dependencies = [
+  "numpy>=2.2.0",
+  "matplotlib>=3.9.0",
+]
+requires-python = ">=3.10"
+readme = "README.md"
+license = "MIT"
+keywords = ["plot", "bacon", "sausage", "tomatoes", "Lobster Thermidor"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+]
+
+
+[project.optional-dependencies]
+testing = ["scipy>=1.14.0"]
+
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+
+# [project.urls]
+# Homepage = "https://example.com"
+# Documentation = "https://readthedocs.org"
+# Repository = "https://github.com/me/spam.git"
+# "Bug Tracker" = "https://github.com/me/spam/issues"
+# Changelog = "https://github.com/me/spam/blob/master/CHANGELOG.md"
