@@ -30,7 +30,13 @@ text_info = [
     {
         "text": r"$\mathrm{V}(t)=11t$",
         "coords": (0.8, 0.74),
-        "color": "blue"
+        "color": "blue",
+        "transform": True
+    },
+    {
+        "text": r"$y=Ae^{-\gamma t} \mathrm{sin}(\omega t) + C$",
+        "coords": (6.75, 27),
+        "color": "red"
     }
 ]
 
@@ -40,7 +46,8 @@ basic_plot = BasicPlot(xlabel="time [s]",
                        ylog_on=True,
                        text_info=text_info,
                        legend_settings="default outside",
-                       style="publication")
+                       style="publication",
+                       grid_style="dash-dot")
 basic_plot.add_data(t, y_noisy, "Noisy data", c='red', ls="-", lw=1)
 basic_plot.add_data(t, y_linear, "Linear", c="blue", ls="--", lw=1)
 basic_plot.plot(export=True, file_name="test_basic.png")
