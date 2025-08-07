@@ -3,6 +3,7 @@ from ..plot_objects import PointsLines, Hist, FillBetween
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from ..utils import *
 from typing import List, Tuple
 
@@ -13,17 +14,17 @@ class BasicPlot(PlotBase):
     """
     
     def __init__(self,
-                 xlim = None,
-                 ylim = None,
-                 xticks = None,
-                 yticks = None,
-                 xlog_on = False,
-                 ylog_on = False,
-                 xlabel = "x",
-                 ylabel = "y",
+                 xlim: Tuple[float, float] | None = None,
+                 ylim: Tuple[float, float] | None = None,
+                 xticks: npt.ArrayLike | None = None,
+                 yticks: npt.ArrayLike | None = None,
+                 xlog_on: bool = False,
+                 ylog_on: bool = False,
+                 xlabel: str = "x",
+                 ylabel: str = "y",
                  text_info: List[dict] | None = None,
                  legend_settings: None | str | dict = "default_inside",
-                 grid_on = False,
+                 grid_style: str | None = None,
                  **kwargs):
         """
         Constructor for a BasicPlot object. This plot specializes in quick y vs x plots and is
@@ -31,6 +32,29 @@ class BasicPlot(PlotBase):
 
         Parameters:
         -----------
+          - xlim/ylim: 2-tuple of lower and upper x, y limits. Default 'None' will use auto limits.
+          - xticks/yticks: array-like object containing location of major ticks. Defualt ticks when
+            'None' passed
+          - xlog_on/ylog_on: boolean enabling or disabling logarithmic axes
+          - xlabel/ylabel: str the x and y labels. Can pass in latex formatted strings for mathprint
+          - text_info: list of dictionaries. Defaults to 'None' if no text to be displayed. Each 
+            dictionary contains information for each piece of text and has the following parameters:
+            * "text": string of the text to add to the plot
+            * "coords": 2-tuple of the coordinates on where to place the text on the axes
+            * any other kwargs to pass into ax.text() (see matplotlib ax.text() for full options)
+          - legend_settings: Can take 3 possible arguments:
+            * None: will not create a legend
+            * str: choose quick available legend presets. Default is "default_inside". See 
+              utils.decorate_legend() for full list of presets.
+            * dict: for full customization, can pass in desired kwargs as a dict for ax.legend()
+          - grid_style: Defaults to None which does not activate the grid. Otherwise, pass in a str
+            for various presets. See utils.grid_adjuster() for various preset types
+          - **kwargs: keyword arguments for the BasePlot constructor
+
+        Generates:
+        ----------
+            Skeleton figure with all of the various settings stored as attributes, ready for plotting
+            with BasicPlot.plot()
         """
         # initialize first as instance of PlotBase class
         super().__init__(**kwargs)
@@ -46,7 +70,7 @@ class BasicPlot(PlotBase):
         self.xlog_on = xlog_on; self.ylog_on = ylog_on
 
         # grid attributes
-        self.grid_on = grid_on
+        self.grid_style = grid_style
 
         # xy label attributes
         self.xlabel = xlabel; self.ylabel = ylabel
@@ -122,25 +146,10 @@ class BasicPlot(PlotBase):
         # ----------------------------------------------------------------
         # compute the x and y limits to apply if no limits were provided
         if self.xlim is None:
-            xlow = magnitude_round(np.min(minx_arr), type="floor") if self.xlog_on else np.min(minx_arr)
-            xhigh = magnitude_round(np.max(maxx_arr), type="ceil") if self.xlog_on else np.max(maxx_arr)
-
-            if self.xlog_on:
-                self.xlim = [xlow, xhigh]
-            else:
-                xrange = xhigh - xlow
-                self.xlim = [xlow-0.04*xrange, xhigh+0.04*xrange]
+            self.xlim = compute_auto_limits(minx_arr, maxx_arr, log=self.xlog_on)
 
         if self.ylim is None:
-            ylow = magnitude_round(np.min(miny_arr), type="floor") if self.ylog_on else np.min(miny_arr)
-            yhigh = magnitude_round(np.max(maxy_arr), type="ceil") if self.ylog_on else np.max(maxy_arr)
-
-            if self.ylog_on:
-                self.ylim = [ylow, yhigh]
-            else:
-                yrange = yhigh - ylow
-                self.ylim = [ylow-0.04*yrange, yhigh+0.04*yrange]
-
+            self.ylim = compute_auto_limits(miny_arr, maxy_arr, log=self.ylog_on)
 
         # apply the settings to the axes
         self.apply_axes_settings(self.xlabel, self.ylabel, self.xlim, self.ylim, self.xlog_on, 
@@ -156,23 +165,16 @@ class BasicPlot(PlotBase):
 
         # extra text to place on the plot
         if self.text_info is not None:
-            for text_info_dict in self.text_info:
-                text = text_info_dict["text"]
-                coords = text_info_dict["coords"]
-
-                # create a filtered dictionary without the text and coordinates
-                exclude = ["text", "coords"]
-                filtered_dict = {k: v for k, v in text_info_dict.items() if k not in exclude}
-                
-                self.ax.text(coords[0], coords[1], text, transform=self.ax.transAxes, **filtered_dict)
+            add_text(self.ax, self.text_info)
 
         # grid
-        if self.grid_on:
-            self.ax.grid()
+        if self.grid_style:
+            print(self.grid_style)
+            grid_adjuster(self.ax, self.grid_style)
 
         # optional saving of the figure
         if export:
-            self.export(file_name="test_basic.png", **kwargs)
+            self.export(file_name=file_name, **kwargs)
 
         plt.show()
 
