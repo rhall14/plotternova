@@ -4,7 +4,6 @@ quick plots with utilizing minimal features.
 """
 
 import numpy as np
-import matplotlib.pyplot as plt
 from plotternova.plot_classes.basic import BasicPlot
 
 # Set random seed for reproducibility

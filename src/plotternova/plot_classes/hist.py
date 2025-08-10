@@ -14,7 +14,7 @@ class HistPlot(PlotBase):
     """
     
     def __init__(self,
-                 hist_type: str = "bar",
+                 hist_type: str = "stepfilled",
                  normalize: bool = False,
                  stack: bool = False,
                  alpha: float = 1,

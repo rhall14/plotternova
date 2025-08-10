@@ -100,7 +100,6 @@ class BasicPlot(PlotBase):
         match object_type.lower():
             case "points" | "line" | "pointslines":
                 self._datasets.append(PointsLines(x_data, y_data, label, **kwargs))
-                self.legend_handles
 
             case "hist":
                 self._datasets.append(Hist())

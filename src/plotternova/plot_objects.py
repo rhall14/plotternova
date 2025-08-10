@@ -52,29 +52,60 @@ class ErrorBar:
 
 class Hist:
     def __init__(self, 
-                 data: npt.ArrayLike, 
-                 label: str, 
-                 bins: npt.ArrayLike,
+                 data: npt.ArrayLike,
+                 bins: int | npt.ArrayLike,
+                 label: str,
+                 weights: npt.ArrayLike | None = None,
                  err: str | npt.ArrayLike | None = None, 
+                 normalize: bool = False,
+                 hist_type: str = "stepfilled",
+                 alpha: float = 1,
                  **kwargs):
         """
         Creates histogram of data where the error can be supplied.
+
+        Parameters:
+        -----------
+          - data: npt.ArrayLike of data to create a histogram for
+          - bins: int or npt.ArrayLike. Passing an int requests for that many equally spaced bins
+            from the min to max data values. Passing an ArrayLike is for custom bins.
+          - label: name given to histogram to be shown in legend
+          - weights: npt.ArrayLike for the weights to apply to each event.
+          - err: str, npt.ArrayLike, or None. str options include "poisson", "standard", or ... 
+            Passing in an ArrayLike, ensuring the same length as the bin count, assigns errors to 
+            those bins. Passing None will not plot errors.
+          - hist_type: str, for various types of histogram appearances. Options include "bar", 
+            "barstacked", "step", and "stepfilled" (same as matplotlib ax.hist options). Defualts to
+            "stepfilled".
+          - alpha: float, sets the opacity of a "filled" or "pattern" histogram. Defaults to 1 for 
+            completely solid color. 0 corresponds to transparent.
+          - kwargs: various other key-word arguments to matplotlib's ax.hist()
         """
+        # store the data attributes
         self.data = data
-        self.label = label
-        self.err = err
-        
+        self.err = err; self.weights = weights
+        self.normalize = normalize
+
         # store the bin attributes
         self.bins = bins
+
+        # store the appearance attributes
+        self.label = label
+        self.hist_type = hist_type
+        self.alpha = alpha
 
         # store various other kwargs that go into plotting a histogram
         self.kwargs = kwargs
 
-    def draw(self, ax) -> None:
+    def draw(self, ax):
         """
         Draws the histrogram on the supplied axes
         """
-        handle, = ax.hist(self.data)
+        handle, = ax.hist(self.data, self.bins, density=self.normalize, histtype=self.hist_type, 
+                          alpha=self.alpha, **self.kwargs)
+    
+        return handle
+
 
     def divide_hists(self, other, ax) -> npt.ArrayLike:
         """
