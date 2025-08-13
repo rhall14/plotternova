@@ -8,7 +8,7 @@ class PointsLines:
     def __init__(self, 
                  xdata, 
                  ydata, 
-                 label,
+                 label: str | None = None,
                  **kwargs) -> None:
         """
         Create points and/or lines plot objects that represent data.
@@ -54,12 +54,13 @@ class Hist:
     def __init__(self, 
                  data: npt.ArrayLike,
                  bins: int | npt.ArrayLike,
-                 label: str,
                  weights: npt.ArrayLike | None = None,
                  err: str | npt.ArrayLike | None = None, 
                  normalize: bool = False,
                  hist_type: str = "stepfilled",
+                 err_type: str = "ATLAS",
                  alpha: float = 1,
+                 label: str | None = None,
                  **kwargs):
         """
         Creates histogram of data where the error can be supplied.
@@ -92,6 +93,7 @@ class Hist:
         # store the appearance attributes
         self.label = label
         self.hist_type = hist_type
+        self.err_type = err_type
         self.alpha = alpha
 
         # store various other kwargs that go into plotting a histogram
