@@ -1,23 +1,23 @@
 from ..core import PlotBase
-from ..plot_objects import PointsLines, Hist
+from ..plot_objects.standard2d import Standard2dObject, PointsLines, Hist, ErrorBar, FillBetween
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 from ..utils import *
-from typing import List, Tuple
+from typing import List, Tuple, Literal
 
 
 class HistPlot(PlotBase):
     """
     Class for creating histogram plots with points, lines, or fill-between.
     """
+
+    ALLOWED_TYPES = (Hist, PointsLines, ErrorBar, FillBetween)
     
     def __init__(self,
-                 hist_type: str = "stepfilled",
                  normalize: bool = False,
                  stack: bool = False,
-                 alpha: float = 1,
                  ratio: bool = False,
                  **kwargs):
         """
@@ -39,35 +39,32 @@ class HistPlot(PlotBase):
         # initialize the figure (without anything plotted yet)
         self._setup_fig()
 
-        self.hist_type = hist_type
         self.normalize = normalize
         self.stack = stack
-        self.alpha = alpha
         self.ratio = ratio
 
 
-
-    '''
-    NOTE: CHANGE THIS TO BE A FUNCTION FOR EACH PLOT_OBJECT TYPE!!! I.E., ADD_POINTSLINES, ADD_HIST,
-          ADD_ERRBAR, ETC...
-    '''
-    def add_data(self, x_data, y_data, label, object_type="pointslines", **kwargs):
+    def add_data(self, *plot_objects: Standard2dObject) -> None:
         """
         Add data to the plot, with the option to choose the type/format the data should be plotted
-        in. Adds data in the form of the Hist, Points, and Line objects.
+        in. Can add data as hists, points/lines, errorbars, or fill-between objects.
+
+        Parameters:
+        -----------
+          - *plot_objects: one or more plot objects to add to the figure. 
         """
-        match object_type.lower():
-            case "hist":
-                self._datasets.append(Hist())
+        for plot_object in plot_objects:
+            if not isinstance(plot_object, HistPlot.ALLOWED_TYPES):
+                raise TypeError(
+                    f"Invalid plot type: {type(plot_object).__name__}. "
+                    f"Allowed types for histograms: {[cls.__name__ for cls in self.ALLOWED_TYPES]}"
+                )
+            else:
+                # ensure normalization is applied to all histograms if requested.
+                if isinstance(plot_object, Hist):
+                    plot_object.normalize = self.normalize
 
-            case "points" | "line" | "pointslines":
-                self._datasets.append(PointsLines(x_data, y_data, label, **kwargs))
-                self.legend_handles
-
-            case _:
-                print(f"Warning: {object_type} is an unkown data type! Check documentation for " +
-                      "allowed data types.")
-
+                self._datasets.append(plot_object)
 
     def remove_data(self):
         pass
@@ -96,6 +93,20 @@ class HistPlot(PlotBase):
         for dataset in self._datasets:
             handle = dataset.draw(self.ax)
             label = dataset.label
+            
+            # determine the max and min x and y values for the data
+            if isinstance(dataset, Hist):
+                minx_arr.append(np.min(dataset.data))
+                maxx_arr.append(np.max(dataset.data))
+            elif isinstance(dataset, PointsLines):
+                minx_arr.append(np.min(dataset.xdata))
+                maxx_arr.append(np.max(dataset.xdata))
+                miny_arr.append(np.min(dataset.ydata))
+                maxy_arr.append(np.max(dataset.ydata))
+            elif isinstance(dataset, ErrorBar):
+                ...
+            elif isinstance(dataset, FillBetween):
+                ...
 
             # store the legend handles and labels
             if label:
@@ -109,8 +120,8 @@ class HistPlot(PlotBase):
         if self.xlim is None:
             self.xlim = compute_auto_limits(minx_arr, maxx_arr)
 
-        if self.ylim is None:
-            self.ylim = compute_auto_limits(miny_arr, maxy_arr, log=self.ylog_on)
+        # if self.ylim is None:
+        #     self.ylim = compute_auto_limits(miny_arr, maxy_arr, log=self.ylog_on)
 
         # apply the settings to the axes
         self.apply_axes_settings(self.xlabel, self.ylabel, self.xlim, self.ylim, self.xlog_on, 

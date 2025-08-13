@@ -27,6 +27,7 @@ class PlotBase(ABC):
                  text_info: List[dict] | None = None,
                  legend_settings: None | str | dict = "default_inside",
                  grid_style: str | None = None,
+                 beautify_ticks: bool = False,
                  title: str | None = None, 
                  dpi: int = 300,
                  style: str | dict = "default",
@@ -57,6 +58,7 @@ class PlotBase(ABC):
             * dict: for full customization, can pass in desired kwargs as a dict for ax.legend()
           - grid_style: Defaults to None which does not activate the grid. Otherwise, pass in a str
             for various presets. See utils.grid_adjuster() for various preset types
+          - beautify_ticks: bool. Calls a function to automatically attempt to make ticks nicer.
           - title: str or None, sets the title of the entire figure
           - dpi: int, sets the figure dpi
           - style: str or dict, defaults to "default". str options are "default", "publication",
@@ -71,6 +73,7 @@ class PlotBase(ABC):
         self.xlim = xlim; self.ylim = ylim
         self.xticks = xticks; self.yticks = yticks
         self.xlog_on = xlog_on; self.ylog_on = ylog_on
+        self.beautify_ticks = beautify_ticks
 
         # grid attributes
         self.grid_style = grid_style
@@ -133,7 +136,8 @@ class PlotBase(ABC):
         self.fig, self.ax = plt.subplots(nrows=self.nrow, ncols=self.ncol, dpi=self.dpi)
 
         # apply tick adjustments
-        tick_adjuster(self.ax)
+        if self.beautify_ticks:
+            tick_adjuster(self.ax)
 
         # extra text to place on the plot
         if self.text_info is not None:
@@ -176,7 +180,8 @@ class PlotBase(ABC):
         self.ax.set_yscale("log") if ylog_on else ...
 
         # set xy limits (if xlim/ylim specified, use those limits. Otherwise use auto limits)
-        self.ax.set_xlim(xlim[0], xlim[1]); self.ax.set_ylim(ylim[0], ylim[1])
+        if xlim: self.ax.set_xlim(xlim[0], xlim[1])
+        if ylim: self.ax.set_ylim(ylim[0], ylim[1])
 
 
     @abstractmethod

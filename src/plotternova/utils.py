@@ -13,6 +13,7 @@ def decorate_legend(ax, handles, labels, settings, fontsize=mpl.rcParams["legend
         if type(settings) == str:
             match settings:
                 case "default inside":
+                    print(handles); print(labels)
                     ax.legend(handles, labels, loc=0, fontsize=fontsize, frameon=False)
 
                 case "default outside":
@@ -44,7 +45,7 @@ def tick_adjuster(ax,
         ax.set_xticks(xticks)
     if yticks:
         ax.set_yticks(yticks)
-    ax.tick_params(direction='in', top=True, right=True)
+    ax.tick_params(which="both", direction='in', top=True, right=True)
 
 
 def add_text(ax, text_dicts: List[dict]):

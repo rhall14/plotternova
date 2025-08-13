@@ -1,5 +1,5 @@
 from ..core import PlotBase
-from ..plot_objects import PointsLines, Hist, FillBetween
+from ..plot_objects.standard2d import PointsLines, Hist, FillBetween
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np

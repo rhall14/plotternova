@@ -4,3 +4,7 @@ __pycache__/
 *.egg
 *.egg-info/
 .eggs/
+
+
+# specific files
+/examples/test.py

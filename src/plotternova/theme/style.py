@@ -7,6 +7,16 @@ DEFAULT_STYLE = {
     "ytick.labelsize": 10,
     "legend.fontsize": 10,
     "axes.titlesize": 14,
+    "xtick.direction": "out",
+    "ytick.direction": "out",
+    "xtick.major.size": 6,
+    "ytick.major.size": 6,
+    "xtick.minor.size": 3,
+    "ytick.minor.size": 3,
+    "xtick.major.width": 1.1,
+    "ytick.major.width": 1.1,
+    "xtick.minor.width": 0.75,
+    "ytick.minor.width": 0.75,
 }
 
 # small figure template for publications
