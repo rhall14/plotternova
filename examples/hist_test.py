@@ -6,6 +6,7 @@ from plotternova.plot_objects.standard2d import Hist
 # generate random data from both normal and exponential distributions for sample plotting
 normal_data = np.random.normal(loc=2, scale=2.5, size=5000)
 expo_data = np.random.exponential(scale=3, size=3000)
+normal_data2 = np.random.normal(loc=12, scale=4, size=6000)
 
 test_hist = HistPlot(stack=False, ratio=False, xlabel=r"$x$", ylabel="Normalized count",
                      legend_settings="default inside", ylog_on = True, beautify_ticks=True, 
@@ -22,6 +23,18 @@ norm_hist = Hist(normal_data,
                  color="#554CE0"
                  )
 
+norm_hist2 = Hist(normal_data2,
+                 bins=30,
+                 counted=False,
+                 normalize=True,
+                 include_error=True,
+                 hist_type="step",
+                 err_style="fillbetween",
+                 label="Normal 2",
+                 linestyle="--",
+                 color="#2C9135"
+                 )
+
 expo_hist = Hist(expo_data,
                  bins=40,
                  counted=False,
@@ -33,6 +46,6 @@ expo_hist = Hist(expo_data,
                  color="#d72b34"
                  )
 
-test_hist.add_data(norm_hist, expo_hist)
+test_hist.add_data(norm_hist, norm_hist2, expo_hist)
 
 test_hist.plot(export=True, file_name="test_hist.png")

@@ -204,9 +204,6 @@ class Hist(Standard2dObject):
                 raise ValueError(f"{self.hist_type} is an invalid histogram type. Choose either "+
                                  "'step', 'stepfilled', or 'bar'.")
 
-        # n, bin_edges, handle = ax.hist(self.data, self.bins, density=self.normalize, histtype=self.hist_type, 
-        #                   alpha=self.alpha, **self.kwargs)
-
         # plot the error bars if requested. can plot in 3 different styles
         if self.err is not None:
             bin_edges = self.bins
@@ -238,7 +235,14 @@ class Hist(Standard2dObject):
 
                 # faint +/- band of the same color around histogram bins
                 case "fillbetween":
-                    ...
+                    # compute the low and high limits for the band
+                    low = self.data - self.err; high = self.data + self.err
+
+                    # duplicate last value of histogram counts for fill_between
+                    low = np.append(low, low[-1]); high = np.append(high, high[-1])
+
+                    ax.fill_between(self.bins, high, low, step="post", color=handle.get_edgecolor(),
+                                    alpha=0.35, linewidth=0.3)
 
                 # error bars about each bin
                 case "errorbar":
