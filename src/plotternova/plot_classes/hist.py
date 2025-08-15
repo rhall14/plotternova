@@ -16,7 +16,6 @@ class HistPlot(PlotBase):
     ALLOWED_TYPES = (Hist, PointsLines, ErrorBar, FillBetween)
     
     def __init__(self,
-                 normalize: bool = False,
                  stack: bool = False,
                  ratio: bool = False,
                  **kwargs):
@@ -39,7 +38,6 @@ class HistPlot(PlotBase):
         # initialize the figure (without anything plotted yet)
         self._setup_fig()
 
-        self.normalize = normalize
         self.stack = stack
         self.ratio = ratio
 
@@ -60,10 +58,6 @@ class HistPlot(PlotBase):
                     f"Allowed types for histograms: {[cls.__name__ for cls in self.ALLOWED_TYPES]}"
                 )
             else:
-                # ensure normalization is applied to all histograms if requested.
-                if isinstance(plot_object, Hist):
-                    plot_object.normalize = self.normalize
-
                 self._datasets.append(plot_object)
 
     def remove_data(self):
@@ -96,8 +90,8 @@ class HistPlot(PlotBase):
             
             # determine the max and min x and y values for the data
             if isinstance(dataset, Hist):
-                minx_arr.append(np.min(dataset.data))
-                maxx_arr.append(np.max(dataset.data))
+                minx_arr.append(np.min(dataset.bins))
+                maxx_arr.append(np.max(dataset.bins))
             elif isinstance(dataset, PointsLines):
                 minx_arr.append(np.min(dataset.xdata))
                 maxx_arr.append(np.max(dataset.xdata))

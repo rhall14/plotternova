@@ -13,7 +13,6 @@ def decorate_legend(ax, handles, labels, settings, fontsize=mpl.rcParams["legend
         if type(settings) == str:
             match settings:
                 case "default inside":
-                    print(handles); print(labels)
                     ax.legend(handles, labels, loc=0, fontsize=fontsize, frameon=False)
 
                 case "default outside":
@@ -129,9 +128,12 @@ def magnitude_round(x, type="ceil"):
         return 10**(np.floor(np.log10(x)))
 
 
-def validate_xy(x, y):
+def check_shape(x, y, xname, yname):
+    """
+    Checks whether dimension of 2 arrays are equal to each other
+    """
     x = np.asarray(x)
     y = np.asarray(y)
     if x.shape != y.shape:
-        raise ValueError(f"x and y must have the same shape, got {x.shape} and {y.shape}")
+        raise ValueError(f"{xname} and {yname} must have the same shape, got {x.shape} and {y.shape}")
     return x, y

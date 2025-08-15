@@ -40,8 +40,8 @@ PUB_SMALL_STYLE = {
     "ytick.major.width": 1,
     "xtick.minor.width": 0.75,
     "ytick.minor.width": 0.75,
-    "text.usetex": True, # enable LaTeX
-    "text.latex.preamble": r"\usepackage{amsmath}"
+    # "text.usetex": True, # enable LaTeX
+    # "text.latex.preamble": r"\usepackage{amsmath}"
 }
 
 # figure template for publications
