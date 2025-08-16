@@ -86,26 +86,36 @@ class HistPlot(PlotBase):
         minx_arr = []; maxx_arr = []; miny_arr = []; maxy_arr = []
         for dataset in self._datasets:
             handle = dataset.draw(self.ax)
-            label = dataset.label
+            # label = dataset.label
             
             # determine the max and min x and y values for the data
             if isinstance(dataset, Hist):
                 minx_arr.append(np.min(dataset.bins))
                 maxx_arr.append(np.max(dataset.bins))
+
             elif isinstance(dataset, PointsLines):
                 minx_arr.append(np.min(dataset.xdata))
                 maxx_arr.append(np.max(dataset.xdata))
                 miny_arr.append(np.min(dataset.ydata))
                 maxy_arr.append(np.max(dataset.ydata))
+
             elif isinstance(dataset, ErrorBar):
                 ...
+
             elif isinstance(dataset, FillBetween):
                 ...
 
             # store the legend handles and labels
-            if label:
-                self.legend_handles.append(handle)
-                self.legend_labels.append(label)
+            if dataset.label is not None:
+                # checks the case where the main data and associated error is to be plotted separately
+                if type(handle) == list:
+                    self.legend_handles.extend(handle)
+                    self.legend_labels.extend([dataset.label, dataset.err_label])
+                
+                else:
+                    self.legend_handles.append(handle)
+                    self.legend_labels.append(dataset.label)
+
 
         # ----------------------------------------------------------------
         # adjusting the axes settings

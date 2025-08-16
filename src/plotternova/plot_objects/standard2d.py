@@ -2,7 +2,8 @@ from abc import ABC, abstractmethod
 import numpy as np
 import numpy.typing as npt
 from typing import Literal, Tuple
-from matplotlib.patches import Polygon
+import matplotlib as mpl
+from matplotlib.patches import Polygon, Patch
 from ..utils import check_shape
 
 
@@ -77,6 +78,7 @@ class Hist(Standard2dObject):
                  err_style: Literal["ATLAS", "fillbetween", "errorbar"] = "ATLAS",
                  alpha: float = 1,
                  label: str | None = None,
+                 err_label: str | None = None,
                  **kwargs):
         """
         Creates histogram of data where the error can be supplied.
@@ -107,6 +109,10 @@ class Hist(Standard2dObject):
           - alpha: float, sets the opacity of a "filled" or "pattern" histogram. Defaults to 1 for 
             completely solid color. 0 corresponds to transparent.
           - label: name given to histogram to be shown in legend
+          - err_label: str, optional. If plotting errors, passing in an err_label will create two 
+            separate legend entries. One for the main histogram and one for the histogram errors. If 
+            Errors are plotted but err_label is not passed, plotternova will combine the main hist 
+            and error handles into 1, and give it the label of the label parameter.
           - kwargs: various other key-word arguments to matplotlib's ax.hist()
         """
         # perform an initial length check for data and weights (if provided)
@@ -142,6 +148,10 @@ class Hist(Standard2dObject):
                     self.err = np.sqrt(weights)
                 else:
                     self.err = np.square(data)
+                
+                # create the error label if passed
+                self.err_label = err_label
+
             else:
                 self.err = None
         
@@ -159,6 +169,10 @@ class Hist(Standard2dObject):
                     self.err = np.sqrt(np.histogram(data, bins=bins, weights=weights**2)[0])
                 else:
                     self.err = np.sqrt(self.data)
+
+                # create the error label if passed
+                self.err_label = err_label
+                
             else:
                 self.err = None
 
@@ -228,10 +242,14 @@ class Hist(Standard2dObject):
                         verts.append((binr, y - e))
                         verts.append((binl, y - e))
 
+                    # enforece hatch_linewidth so it affects the legend too
+                    mpl.rcParams['hatch.linewidth'] = 0.5
+
                     # Create polygon with hatching
                     poly = Polygon(verts, closed=True, facecolor='none', edgecolor='black', 
                                    hatch='///////////', hatch_linewidth=0.5, linewidth=0)
-                    ax.add_patch(poly)
+                    
+                    err_handle = ax.add_patch(poly)
 
                 # faint +/- band of the same color around histogram bins
                 case "fillbetween":
@@ -241,7 +259,7 @@ class Hist(Standard2dObject):
                     # duplicate last value of histogram counts for fill_between
                     low = np.append(low, low[-1]); high = np.append(high, high[-1])
 
-                    ax.fill_between(self.bins, high, low, step="post", color=handle.get_edgecolor(),
+                    err_handle = ax.fill_between(self.bins, high, low, step="post", color=handle.get_edgecolor(),
                                     alpha=0.35, linewidth=0.3)
 
                 # error bars about each bin
@@ -255,16 +273,25 @@ class Hist(Standard2dObject):
                         case "step" | "point":
                             errorbar_color = handle.get_facecolor()
 
-                    hist_errbar = ErrorBar(bincenters, self.data, self.err, linestyle='none', 
-                                           color=errorbar_color)
-                    hist_errbar.draw(ax)
+                    err_handle = ax.errorbar(bincenters, self.data, yerr=self.err, linestyle='none', 
+                                             color=errorbar_color, elinewidth=1, capsize=1)
 
                 case _:
                     print(f"Warning: {self.err_style} not a error style.")
                     print("Valid error types are ['ATLAS', 'fillbetween', 'errorbar'].")
 
+            if self.err is None:
+                return handle
 
-        return handle
+            else:
+                # if an error label was passed, include the error in the legend as a separate entry
+                if self.err_label is not None:
+                    return [handle, err_handle]
+                
+                # otherwise, overlay the error handle on top of the histogram handle, and the label
+                # given for both is just label
+                else:
+                    return (handle, err_handle) # tuple, which combines into one legend element 
 
 
     def divide_hists(self, other, ax) -> npt.ArrayLike:
